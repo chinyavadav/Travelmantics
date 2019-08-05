@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "274870301842",
+    "firebase_url": "https://travelmantics-1564735068993.firebaseio.com",
+    "project_id": "travelmantics-1564735068993",
+    "storage_bucket": "travelmantics-1564735068993.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:274870301842:android:84b1b41d86f9c833",
+        "android_client_info": {
+          "package_name": "zw.co.netpay.travelmantics"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "274870301842-ftfft9b6p5a94u6sn6894knsul963ghg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "zw.co.netpay.travelmantics",
+            "certificate_hash": "0c18be9deea3a0307b494e45b4d18419a5e5a26d"
+          }
+        },
+        {
+          "client_id": "274870301842-40mbosi1tsitrj2iqn4dgp48j22rogf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLCReLh4do8NaFbgrsoCgcY9-IEGC30OQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "274870301842-40mbosi1tsitrj2iqn4dgp48j22rogf9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
