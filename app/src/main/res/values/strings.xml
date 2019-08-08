@@ -16,4 +16,5 @@
     <string name="title_save">Save</string>
     <string name="title_insert">New Travel Deal</string>
     <string name="logout_menu">Logout</string>
+    <string name="title_delete">Delete</string>
 </resources>

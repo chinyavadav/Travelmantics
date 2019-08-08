@@ -11,7 +11,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +31,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -61,7 +65,7 @@ public class AdminActivity extends AppCompatActivity {
             txtTitle=findViewById(R.id.txtTitle);
             txtPrice=findViewById(R.id.txtPrice);
             txtDescription=findViewById(R.id.txtDescription);
-            imageView=findViewById(R.id.image);
+            imageView=findViewById(R.id.imageView);
 
 
             Intent intent=getIntent();
@@ -83,7 +87,6 @@ public class AdminActivity extends AppCompatActivity {
                     intent.setType("image/*");
                     intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
                     startActivityForResult(intent.createChooser(intent,"Insert Picture"),PICTURE_RESULT);
-
                 }
             });
         }else{
@@ -150,12 +153,12 @@ public class AdminActivity extends AppCompatActivity {
     private void deleteDeal() {
         if(deal==null) {
             Toast.makeText(this, "Please save deal before deleting!", Toast.LENGTH_LONG).show();
-            return;
-        }
-        mDatabaseReference.child(deal.getId()).removeValue();
-        if(deal.getImageName()!=null || deal.getImageName().isEmpty()==false){
-            StorageReference picRef=FirebaseUtil.mStorage.getReference().child(deal.getImageName());
-            picRef.delete();
+        }else{
+            mDatabaseReference.child(deal.getId()).removeValue();
+            if(deal.getImageName()!=null && deal.getImageName().isEmpty()==false){
+                StorageReference picRef=FirebaseUtil.mStorage.getReference().child(deal.getImageName());
+                picRef.delete();
+            }
         }
     }
 
@@ -179,14 +182,28 @@ public class AdminActivity extends AppCompatActivity {
             StorageReference ref=FirebaseUtil.mStorageRef.child(imageUri.getLastPathSegment());
             ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String url=taskSnapshot.getUploadSessionUri().toString();
-                    String pictureName=taskSnapshot.getStorage().getPath();
-                    deal.setImageURL(url);
-                    deal.setImageName(pictureName);
-                    showImage(url);
+                public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+                    Task<Uri> result = taskSnapshot.getStorage().getDownloadUrl();
+                    result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String url=uri.toString();
+                            Log.i("UploadImageUrl",url);
+                            String pictureName=taskSnapshot.getStorage().getPath();
+                            deal.setImageURL(url);
+                            deal.setImageName(pictureName);
+                            showImage(url);
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.i("UploadImageUrl","Failed to upload image");
                 }
             });
+        }else{
+            Toast.makeText(this, "Please selected a valid picture!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -201,7 +218,6 @@ public class AdminActivity extends AppCompatActivity {
                         Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     showDialog("External storage", context,
                             Manifest.permission.READ_EXTERNAL_STORAGE);
-
                 } else {
                     ActivityCompat
                             .requestPermissions(
@@ -213,21 +229,19 @@ public class AdminActivity extends AppCompatActivity {
             } else {
                 return true;
             }
-
         } else {
             return true;
         }
     }
 
     private void showImage(String url){
-        if(url!="" && url!=null && url.isEmpty()==false){
+        if(url!=null && url.isEmpty()==false){
             int width= Resources.getSystem().getDisplayMetrics().widthPixels;
             Picasso.get()
                     .load(url)
                     .resize(width,width*2/3)
                     .centerCrop()
             .into(imageView);
-
         }
     }
 }
